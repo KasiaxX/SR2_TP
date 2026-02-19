@@ -5,7 +5,7 @@ NOM_ETU = NOM_PRENOM_A_CHANGER
 # Compiler and flags
 CC     = gcc
 # enable POSIX features (nanosleep...) with -D_POSIX_C_SOURCE
-CFLAGS = -std=c11 -D_POSIX_C_SOURCE=199309L -Wall
+CFLAGS = -std=c11 -D_POSIX_C_SOURCE=200809L -Wall
 LDLIBS = -lpthread
 
 # Dirs
