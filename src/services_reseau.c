@@ -97,10 +97,13 @@ void *perf_eval_thread(void *args) {
     int number_of_points = 0;
     int sent_packet_count_prev = 0;
     int packet_loss_count_prev = 0;
+    struct timespec ts;
+    ts.tv_sec  = nl_conf.plot_period_ms / 1000;
+    ts.tv_nsec = (nl_conf.plot_period_ms % 1000) * 1000000L;
 
     while (!end_communication) {
 
-        usleep(nl_conf.plot_period_ms * 1000);
+        nanosleep(&ts, NULL);
         perf_array[number_of_points].packet_count = sent_packet_count - sent_packet_count_prev;
         perf_array[number_of_points].loss_count = packet_loss_count - packet_loss_count_prev;
         sent_packet_count_prev = sent_packet_count;
