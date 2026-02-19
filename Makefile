@@ -42,30 +42,30 @@ OBJ_TDD4_R = $(OBJDIR)/proto_tdd_v4_recepteur.o
 .SECONDARY:
 
 # -----------------------------------------------------------
-# Top-level targets. Call e.g. `make tdd0` or `make tdd3.1`
+# Top-level targets. Call e.g. `make tdd0` or `make tdd3`
 # -----------------------------------------------------------
-tdd%: dirs $(OBJ_COMMON) $(OBJ_APP_NC)
+tdd%: $(OBJ_COMMON) $(OBJ_APP_NC)
 	$(eval export OBJ_APP = $(OBJ_APP_NC))
 	$(eval export OBJ_TDD_S = $(OBJ_TDD$*_S))
 	$(eval export OBJ_TDD_R = $(OBJ_TDD$*_R))
-	make $(SENDER) $(RECEIVER)
+	$(MAKE) $(SENDER) $(RECEIVER)
 
 # Link rules
-$(SENDER): $(OBJ_COMMON) $(OBJ_APP) $(OBJ_TDD_S)
+$(SENDER): $(OBJ_COMMON) $(OBJ_APP) $(OBJ_TDD_S) | $(BINDIR)
 	$(CC) -o $(SENDER) $(OBJ_COMMON) $(OBJ_APP) $(OBJ_TDD_S) $(LDLIBS)
 
-$(RECEIVER): $(OBJ_COMMON) $(OBJ_APP) $(OBJ_TDD_R)
+$(RECEIVER): $(OBJ_COMMON) $(OBJ_APP) $(OBJ_TDD_R) | $(BINDIR)
 	$(CC) -o $(RECEIVER) $(OBJ_COMMON) $(OBJ_APP) $(OBJ_TDD_R) $(LDLIBS)
 
 # Compile rules
 # '%' matches filename
 # $@  for the pattern-matched target
 # $<  for the pattern-matched dependency
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
+$(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
 	$(CC) -o $@ -c $< $(CFLAGS)
 
-dirs:
-	@mkdir -p $(OBJDIR) $(BINDIR)
+$(OBJDIR) $(BINDIR):
+	@mkdir -p $@
 
 # Housekeeping
 clean:
