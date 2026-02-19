@@ -31,10 +31,8 @@ OBJ_TDD1_R = $(OBJDIR)/proto_tdd_v1_recepteur.o
 OBJ_TDD2_S = $(OBJDIR)/proto_tdd_v2_emetteur.o
 OBJ_TDD2_R = $(OBJDIR)/proto_tdd_v2_recepteur.o
 
-OBJ_TDD3.1_S = $(OBJDIR)/proto_tdd_v3.1_emetteur.o
-OBJ_TDD3.2_S = $(OBJDIR)/proto_tdd_v3.2_emetteur.o
-OBJ_TDD3.1_R = $(OBJDIR)/proto_tdd_v3_recepteur.o
-OBJ_TDD3.2_R = $(OBJDIR)/proto_tdd_v3_recepteur.o
+OBJ_TDD3_S = $(OBJDIR)/proto_tdd_v3_emetteur.o
+OBJ_TDD3_R = $(OBJDIR)/proto_tdd_v3_recepteur.o
 
 OBJ_TDD4_S = $(OBJDIR)/proto_tdd_v4_emetteur.o
 OBJ_TDD4_R = $(OBJDIR)/proto_tdd_v4_recepteur.o
