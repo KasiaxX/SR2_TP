@@ -26,3 +26,40 @@ int dans_fenetre(unsigned int inf, unsigned int pointeur, int taille) {
         /* pointeur <= sup < inf */
         ( sup < inf && pointeur <= sup);
 }
+
+uint8_t generer_controle(paquet_t paquet){
+    uint8_t somme = 0;
+
+    //^ XOR
+
+    somme = paquet.type ^ somme;
+    somme = paquet.num_seq ^ somme;
+    somme = paquet.lg_info ^ somme;
+    
+    for(int i=0; i<paquet.lg_info; i++){
+        somme = paquet.info[i] ^ somme;
+    }
+
+    return somme;
+}
+
+/* verifier si il n'y a pas d'erreur */
+uint8_t verifier_controle(paquet_t paquet){
+    uint8_t somme_recu = paquet.somme_ctrl;
+
+    uint8_t somme = generer_controle(paquet);
+
+    return somme_recu == somme;
+}
+
+/* pour incrementer le numero de paquet avec le modulo donne*/
+int inc(int num_paquet, int mod){
+    num_paquet = (num_paquet + 1) %mod;
+
+    return num_paquet;
+}
+
+
+
+
+
