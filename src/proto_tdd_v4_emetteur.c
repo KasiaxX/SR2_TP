@@ -11,7 +11,7 @@
 #include "application.h"
 #include "couche_transport.h"
 #include "services_reseau.h"
-#define N 4
+#define N 8
 #define CAPACITE 16
 
 /* =============================== */
@@ -25,10 +25,16 @@ int main(int argc, char* argv[])
     int taille_fenetre = N;
     int borneInf = 0;
     int curseur = 0;
+
     paquet_t tab[CAPACITE]; //tableau de paquets de taille 8 ; 1er paquet - 0, l'indice de tab - 0 etc ...
+    int ack_recu[CAPACITE] = {0}; // 1 si le paquet a été acquitté, 0 sinon
 
     // if (argc > 1) {
     //     taille_fenetre = atoi(argv[1]);
+    //     if (taille_fenetre > CAPACITE / 2) {
+    //         printf("Erreur: Taille de fenetre trop grande (max %d)\n", CAPACITE/2);
+    //         return 1;
+    //     }
     // }
 
     init_reseau(EMISSION);
@@ -61,11 +67,11 @@ int main(int argc, char* argv[])
 
             printf("[TRP] j'envoye le paquet\n");
 
-            if(borneInf == curseur){  //le 1er paquet de la fenetre
-                depart_temporisateur(100);  
-                printf("[TRP] depart temporisateur\n");     
-            }
-
+            // On lance un timer SPECIFIQUE à ce paquet
+            depart_temporisateur(100);  
+            printf("[TRP] depart temporisateur\n");     
+            
+            ack_recu[curseur] = 0; // Initialisation de l'état
              //on prend le paquet suivant
             curseur = inc(curseur,CAPACITE);
 
@@ -82,43 +88,43 @@ int main(int argc, char* argv[])
                 printf("[TRP] paquet recu\n"); 
 
                 de_reseau(&pack);
+
                 //dans_fenetre -> verifier le num seq valide
                 if(verifier_controle(pack)){
                     printf("[TRP] verifier controle\n"); 
 
                     if(dans_fenetre(borneInf, pack.num_seq, taille_fenetre)){
-                        printf("[TRP] dans la fenetre 2\n"); 
-                        borneInf = inc(pack.num_seq, CAPACITE); //decalage de fenetre
+                        printf("[TRP] ACK recu pour paquet %d\n", pack.num_seq);
 
+
+                        // On marque le paquet comme acquitté et on arrête SON timer
+                        ack_recu[pack.num_seq] = 1;
                         arret_temporisateur(); // On arrête le timer actuel
 
-                        // S'il reste des paquets non acquittés, on relance le timer
-                        if(borneInf != curseur){ // tout a ete acquitte donc on arrete le timeur 
-                            depart_temporisateur(100);
-                            printf("[TRP] arret temporisateur\n"); 
+                        // Décalage de la fenêtre UNIQUEMENT si la borneInf est acquittée
+                        while (borneInf != curseur && ack_recu[borneInf] == 1) {
+                            borneInf = inc(borneInf, CAPACITE);
                         }
                     }
                     // Si l'ACK est corrompu, on ne fait rien, on attendra le timeout.
                     
                 }else {
                     // Paquet corrompu reçu : on ne fait rien, on attendra le timeout.
-                    printf("[TRP] Paquet corrompu ignoré.\n"); 
+                    printf("[TRP] ACK %d hors fenetre ignore\n", pack.num_seq);                
                 }
+
             }else{  
                 //paquet n'est pas recu - il n'y a pas d' ack
                 // TIMEOUT (event != PAQUET_RECU)
+                
+                int seq_perdu = event;
                 printf("[EMETTEUR] Erreur -> retransmission\n");
-                int i = borneInf;
 
-                //on relance le timer pour la retransmission
-                depart_temporisateur(100);
-
-                // On retransmet TOUTE la fenêtre (de borneInf à curseur)
-                while(i != curseur){
-                    printf("[TRP] Renvoie de paquet");
-                    vers_reseau(&tab[i]);
-                    i = inc(i, CAPACITE);
-                }
+                // On retransmet UNIQUEMENT ce paquet
+                vers_reseau(&tab[seq_perdu]);
+                
+                // On relance son timer
+                depart_temporisateur_num(seq_perdu, 100);
             }
         }      
     }

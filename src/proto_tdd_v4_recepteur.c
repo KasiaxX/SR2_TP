@@ -11,7 +11,7 @@
 #include "application.h"
 #include "couche_transport.h"
 #include "services_reseau.h"
-#define N 4
+#define N 8
 #define CAPACITE 16
 
 /* =============================== */
@@ -23,6 +23,7 @@ int main(int argc, char* argv[])
     paquet_t pdata, pack;                  /* paquet utilisé par le protocole */
     int fin = 0;                     /* condition d'arrêt */
     int paquet_attendu = 0;
+    int taille_fenetre = N;
 
     init_reseau(RECEPTION);
 
