@@ -61,6 +61,7 @@ int main(int argc, char* argv[])
 
             printf("[TRP] j'envoye le paquet\n");
 
+            //temporisateur que pour le 1er paquet de window
             if(borneInf == curseur){  //le 1er paquet de la fenetre
                 depart_temporisateur(100);  
                 printf("[TRP] depart temporisateur\n");     
@@ -88,6 +89,7 @@ int main(int argc, char* argv[])
 
                     if(dans_fenetre(borneInf, pack.num_seq, taille_fenetre)){
                         printf("[TRP] dans la fenetre 2\n"); 
+                        
                         borneInf = inc(pack.num_seq, CAPACITE); //decalage de fenetre
 
                         arret_temporisateur(); // On arrête le timer actuel

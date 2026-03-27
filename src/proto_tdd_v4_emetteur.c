@@ -11,8 +11,8 @@
 #include "application.h"
 #include "couche_transport.h"
 #include "services_reseau.h"
-#define N 8
-#define CAPACITE 16
+#define W 8 //window
+#define CAPACITE 16  //
 
 /* =============================== */
 /* Programme principal - émetteur  */
@@ -22,11 +22,11 @@ int main(int argc, char* argv[])
     unsigned char message[MAX_INFO]; /* message de l'application */
     int taille_msg;                  /* taille du message */
     paquet_t  pack;                  /* paquet utilisé par le protocole */
-    int taille_fenetre = N;
+    int taille_fenetre = W;
     int borneInf = 0;
     int curseur = 0;
 
-    paquet_t tab[CAPACITE]; //tableau de paquets de taille 8 ; 1er paquet - 0, l'indice de tab - 0 etc ...
+    paquet_t tab[CAPACITE]; //tableau de paquets de taille 16; 1er paquet - 0, l'indice de tab - 0 etc ...
     int ack_recu[CAPACITE] = {0}; // 1 si le paquet a été acquitté, 0 sinon
 
     // if (argc > 1) {
@@ -95,7 +95,6 @@ int main(int argc, char* argv[])
 
                     if(dans_fenetre(borneInf, pack.num_seq, taille_fenetre)){
                         printf("[TRP] ACK recu pour paquet %d\n", pack.num_seq);
-
 
                         // On marque le paquet comme acquitté et on arrête SON timer
                         ack_recu[pack.num_seq] = 1;
