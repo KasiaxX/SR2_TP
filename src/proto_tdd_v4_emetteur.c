@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
             printf("[TRP] j'envoye le paquet\n");
 
             // On lance un timer SPECIFIQUE à ce paquet
-            depart_temporisateur(100);  
+            depart_temporisateur_num(curseur, 100); 
             printf("[TRP] depart temporisateur\n");     
             
             ack_recu[curseur] = 0; // Initialisation de l'état
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
 
                         // On marque le paquet comme acquitté et on arrête SON timer
                         ack_recu[pack.num_seq] = 1;
-                        arret_temporisateur(); // On arrête le timer actuel
+                        arret_temporisateur_num(pack.num_seq); // On arrête le timer actuel
 
                         // Décalage de la fenêtre UNIQUEMENT si la borneInf est acquittée
                         while (borneInf != curseur && ack_recu[borneInf] == 1) {

@@ -1,8 +1,8 @@
 /*************************************************************
-* proto_tdd_v0 -  émetteur                                   *
-* TRANSFERT DE DONNEES  v0                                   *
+* proto_tdd_v1 -  émetteur                                   *
+* TRANSFERT DE DONNEES  v1                                   *
 *                                                            *
-* Protocole sans contrôle de flux, sans reprise sur erreurs  *
+* Stop n Wait (negatif)                                      *
 *                                                            *
 * Université de Toulouse / FSI / Dpt d'informatique          *
 **************************************************************/

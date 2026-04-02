@@ -25,8 +25,6 @@ int main(int argc, char* argv[])
     int paquet_attendu = 0;
     int taille_fenetre = W;
 
-    int borneInf = 0;
-    int curseur = 0;
     
 
     paquet_t buffer[CAPACITE]; //tableau de paquets de taille 16 ; 1er paquet - 0, l'indice de tab - 0 etc ...
@@ -51,67 +49,64 @@ int main(int argc, char* argv[])
         //     message[i] = pdata.info[i];
         // }
 
-        pack.type = ACK;
-        pack.lg_info = 0;
-        pack.num_seq = (paquet_attendu - 1 + CAPACITE) % CAPACITE;
-        
         
         if(verifier_controle(pdata)){
 
             printf("[TRP] verifier controle. \n");
 
-            if(dans_fenetre(borneInf, curseur, taille_fenetre)){
+            pack.type = ACK;
+            pack.lg_info = 0;
+            pack.num_seq = pdata.num_seq; // SR: On acquitte le paquet reçu, même hors-séquence
+            pack.somme_ctrl = generer_controle(pack);
+
+            // On envoie l'ACK immédiatement
+            vers_reseau(&pack); 
+            printf("[TRP] Envoi ACK %d\n", pack.num_seq);
+
+            
+
+            if(dans_fenetre(paquet_attendu, pdata.num_seq, taille_fenetre)){
                 printf("[TRP] dans la fenetre \n");
 
                 if(pdata.num_seq != paquet_attendu){  //Not first ; paquet hors sequence
 
-                    int cpt = 0;
-                    /* construction paquet */
-                    for (int i=0; pdata.info[i] != '\0'; i++) {
-                       buffer[curseur].info[i] = pdata.info[i];
-                       cpt++;
+
+                    // Paquet hors séquence : on le stocke dans le buffer
+                    if(paquet_hors[pdata.num_seq] == 0) {
+
+                        buffer[pdata.num_seq] = pdata; // On stocke le paquet ENTIER à son index
+                        paquet_hors[pdata.num_seq] = 1;
+                        printf("[TRP] Paquet %d hors sequence, mis en buffer.\n", pdata.num_seq);
                     }
-                    buffer[curseur].lg_info = cpt;
-                    buffer[curseur].type = DATA;
-                    buffer[curseur].num_seq = curseur;
-                    buffer[curseur].somme_ctrl = generer_controle(buffer[curseur]);
 
-                    printf("[TRP] le paquet recu %d est le paquet attendu %d. \n", pdata.num_seq, paquet_attendu);
+                }else{ //c'est le first ; 1er paquet; paqet attendu
+                    // C'est le paquet attendu ! On le remonte à l'application.
 
-                    paquet_hors[pdata.num_seq] = 1; 
-                }
-                else{ //c'est le first ; 1er paquet; paqet attendu
-
-                    fin = vers_application(&pdata, pdata.lg_info);
-                    borneInf = inc(borneInf, CAPACITE); //on decale la fenetre
-                    //on met a jour le num de sequence pour envoyer l'ack
-                    pack.num_seq = paquet_attendu;
+                    fin = vers_application(&pdata.info, pdata.lg_info);
+                    // borneInf = inc(borneInf, CAPACITE); //on decale la fenetre
+                    // //on met a jour le num de sequence pour envoyer l'ack
+                    // pack.num_seq = paquet_attendu;
 
                     //on increment le paquet attendu
                     paquet_attendu = inc(paquet_attendu, CAPACITE);
 
-                    while( paquet_hors[borneInf] == 1){
-                        fin = vers_application(buffer[borneInf].info, buffer[borneInf].lg_info);
-                        paquet_hors[borneInf] = 0;
-                        borneInf = inc(borneInf, CAPACITE); //on decale la fenetre
+                    while( paquet_hors[paquet_attendu] == 1){
+                        printf("[TRP] Paquet %d sorti du buffer et remonte.\n", paquet_attendu);
 
-                        pack.num_seq = paquet_attendu;
+                        fin = vers_application(buffer[paquet_attendu].info, buffer[paquet_attendu].lg_info);
+
+                        //on vide la case
+                        paquet_hors[paquet_attendu] = 0;
+                        // borneInf = inc(borneInf, CAPACITE); //on decale la fenetre
+
                         paquet_attendu = inc(paquet_attendu, CAPACITE);
                     }
-
                 }
-
-            }
-            vers_reseau(&pack);
+            } 
             
         }else {
             printf("[TRP] Paquet corrompu reçu.\n");
         }
-
-        pack.somme_ctrl = generer_controle(pack);
-
-        printf("[TRP] on envoye le ack de paquet %d.\n", pdata.num_seq);
-        // vers_reseau(&pack);
 
     }
 

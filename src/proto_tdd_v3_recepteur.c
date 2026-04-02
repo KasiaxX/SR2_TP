@@ -1,6 +1,6 @@
 /*************************************************************
-* proto_tdd_v0 -  récepteur                                  *
-* TRANSFERT DE DONNEES  v0                                   *
+* proto_tdd_v3 -  récepteur                                  *
+* TRANSFERT DE DONNEES  v3                                   *
 *                                                            *
 * Protocole sans contrôle de flux, sans reprise sur erreurs  *
 *                                                            *
@@ -36,12 +36,6 @@ int main(int argc, char* argv[])
         de_reseau(&pdata);
 
         printf("[TRP] j'ai recu le paquet %d.\n", pdata.num_seq);
-
-
-        // /* extraction des donnees du paquet recu */
-        // for (int i=0; i<pdata.lg_info; i++) {
-        //     message[i] = pdata.info[i];
-        // }
 
         pack.type = ACK;
         pack.lg_info = 0;

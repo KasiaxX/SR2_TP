@@ -1,6 +1,6 @@
 /*************************************************************
-* proto_tdd_v0 -  émetteur                                   *
-* TRANSFERT DE DONNEES  v0                                   *
+* proto_tdd_v3 -  émetteur                                   *
+* TRANSFERT DE DONNEES  v3                                   *
 *                                                            *
 * Protocole sans contrôle de flux, sans reprise sur erreurs  *
 *                                                            *
@@ -93,11 +93,11 @@ int main(int argc, char* argv[])
                         borneInf = inc(pack.num_seq, CAPACITE); //decalage de fenetre
 
                         arret_temporisateur(); // On arrête le timer actuel
+                        printf("[TRP] arret temporisateur\n"); 
 
                         // S'il reste des paquets non acquittés, on relance le timer
-                        if(borneInf != curseur){ // tout a ete acquitte donc on arrete le timeur 
+                        if(borneInf != curseur){  
                             depart_temporisateur(100);
-                            printf("[TRP] arret temporisateur\n"); 
                         }
                     }
                     // Si l'ACK est corrompu, on ne fait rien, on attendra le timeout.
